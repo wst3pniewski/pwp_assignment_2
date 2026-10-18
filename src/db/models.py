@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, false
+from sqlalchemy import Column, ForeignKey, Table, false
 from sqlalchemy.orm import (
     Mapped,
     declarative_base,
@@ -9,6 +9,19 @@ from sqlalchemy.orm import (
 )
 
 Base = declarative_base()
+
+subjects_experiments = Table(
+    "subjects_experiments",
+    Base.metadata,
+    Column(
+        "subject_id", ForeignKey("subjects.id", ondelete="CASCADE"), primary_key=True
+    ),
+    Column(
+        "experiment_id",
+        ForeignKey("experiments.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+)
 
 
 class Experiment(Base):
@@ -20,6 +33,10 @@ class Experiment(Base):
     type: Mapped[int]
     finished: Mapped[bool] = mapped_column(default=False, server_default=false())
     data_points: Mapped[list["DataPoint"]] = relationship(back_populates="experiment")
+
+    subjects = relationship(
+        "Subject", secondary=subjects_experiments, back_populates="experiments"
+    )
 
     def __repr__(self):
         return (
@@ -46,3 +63,13 @@ class DataPoint(Base):
             f"(id={self.id!r}, real_value={self.real_value!r}"
             f", target_value={self.target_value!r}"
         )
+
+
+class Subject(Base):
+    __tablename__ = "subjects"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    gdpr_accepted: Mapped[bool] = mapped_column(default=False, server_default=false())
+    experiments = relationship(
+        "Experiment", secondary=subjects_experiments, back_populates="subjects"
+    )
