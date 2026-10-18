@@ -40,7 +40,6 @@ if __name__ == "__main__":
 
 with Session(engine) as session:
     experiments = session.scalars(select(Experiment)).all()
-    # experiments = session.scalars(select(Experiment, DataPoint).join(DataPoint))
     data_points = session.scalars(select(DataPoint)).all()
     print(f"Experiments: {experiments}")
     # print(f"Data pointse {data_points}")
