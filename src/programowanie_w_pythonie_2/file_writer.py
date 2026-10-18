@@ -10,9 +10,16 @@ class FileWriter:
         return self.f
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
+        if exc_type is not None:
+            print(f"Błąd podczas zapisu {exc_value}")
+            return False  # Zakonczono failem - propagacja
         self.f.close()
 
 
 if __name__ == "__main__":
     with FileWriter("data/example.txt") as f:
+        f.write("Hello world!")
+
+    with FileWriter("data/example_2.txt") as f:
+        x = 1 / 0
         f.write("Hello world!")
